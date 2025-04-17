@@ -11,10 +11,13 @@ It helps you keep track of your spending and supports backup & restore via **Goo
 - 📅 View historical records and summaries
 - ☁️ **Backup & restore** your SQLite database using your own Google Drive
 - 🔐 All your data stays private — no third-party servers involved
-- 🌙 Modern UI with dark mode support
+
 
 ---
-
+## 📜TODO
+- Redesign UI
+- Improve the add expense/income function
+---
 ## 📦 Tech Stack
 
 - React Native
@@ -109,17 +112,6 @@ A loading animation will appear during upload/download to inform the user and pr
 
 ---
 
-## 📱 Screenshots (Optional)
-
-> _You can add app UI screenshots here._
-
----
-
-## 🤝 Contributing
-
-Pull requests are welcome. If you have suggestions or bug reports, please open an issue.
-
----
 
 ## 📄 License
 
