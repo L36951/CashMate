@@ -1,97 +1,118 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# 💰 CashMate – Personal Expense Tracker with Google Drive Backup
 
-# Getting Started
+**CashMate** is a lightweight and secure expense tracking app built with React Native.  
+It helps you keep track of your spending and supports backup & restore via **Google Drive** – all under your control.
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+---
 
-## Step 1: Start Metro
+## ✨ Features
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+- 🧾 Track daily expenses by category
+- 📅 View historical records and summaries
+- ☁️ **Backup & restore** your SQLite database using your own Google Drive
+- 🔐 All your data stays private — no third-party servers involved
 
-To start the Metro dev server, run the following command from the root of your React Native project:
 
-```sh
-# Using npm
-npm start
+---
+## 📜TODO
+- Redesign UI
+- Improve the add expense/income function
+---
+## 📦 Tech Stack
 
-# OR using Yarn
-yarn start
+- React Native
+- SQLite
+- Google Sign-In & Google Drive API
+- TypeScript
+- Node.js
+
+---
+
+## ⚙️ Setup Instructions
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/your-username/CashMate.git
+cd CashMate
 ```
 
-## Step 2: Build and run your app
+---
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+### 2. Install Dependencies
 
-### Android
-
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+```bash
+npm install
+npx pod-install   # for iOS
 ```
 
-### iOS
+---
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+### 3. Configure Google Drive API (Required for Cloud Backup)
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+> 🛡️ Each user must configure their **own** Google API credentials for privacy and security.
 
-```sh
-bundle install
+#### 🔧 Create API Credentials
+
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Create a new project (or use existing one)
+3. Enable the following APIs:
+   - **Google Drive API**
+   - **Google People API**
+4. Navigate to "Credentials" → Click **Create Credentials**
+   - Choose **OAuth Client ID**
+   - Application type: **Web application**
+   - Note down your **Web Client ID**
+5. Create another OAuth Client ID for Android (optional if using Android):
+   - Application type: **Android**
+   - Provide your **Android package name** and **SHA-1**
+
+---
+
+### 4. Setup Environment Variables
+
+Create a `.env` file in your project root:
+
+```env
+GOOGLE_WEB_CLIENT_ID=<your_web_client_id>
 ```
 
-Then, and every time you update your native dependencies, run:
+Make sure `.env` is listed in `.gitignore` so it won’t be uploaded to GitHub.
 
-```sh
-bundle exec pod install
+---
+
+### 5. Run the App
+
+```bash
+# For Android
+npx react-native run-android
+
+# For iOS (requires macOS and Xcode)
+npx react-native run-ios
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+---
 
-```sh
-# Using npm
-npm run ios
+## ☁️ Backup & Restore Functionality
 
-# OR using Yarn
-yarn ios
-```
+After logging in with Google, the app allows:
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+- **Upload** your local SQLite database (`cashmate.db`) to a dedicated folder in Google Drive
+- **Download** the latest backup to restore your records on a new device or after reinstall
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+A loading animation will appear during upload/download to inform the user and prevent double actions.
 
-## Step 3: Modify your app
+---
 
-Now that you have successfully run the app, let's make changes!
+## 🛡️ Security & Privacy
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+- No data is sent to any external servers.
+- You control your data through your own Google Drive.
+- Only the database file is uploaded (not any metadata or user analytics).
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+---
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
 
-## Congratulations! :tada:
+## 📄 License
 
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+MIT License © 2025 Kenny On
