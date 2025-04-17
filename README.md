@@ -12,12 +12,15 @@ It helps you keep track of your spending and supports backup & restore via **Goo
 - ☁️ **Backup & restore** your SQLite database using your own Google Drive
 - 🔐 All your data stays private — no third-party servers involved
 
-
 ---
+
 ## 📜TODO
+
 - Redesign UI
 - Improve the add expense/income function
+
 ---
+
 ## 📦 Tech Stack
 
 - React Native
@@ -112,6 +115,12 @@ A loading animation will appear during upload/download to inform the user and pr
 
 ---
 
+## 📸 Screenshots
+
+Here are some screenshots of the CashMate app:
+
+![Screenshot 1](./assets/screen1.png)
+![Screenshot 2](./assets/screen2.png)
 
 ## 📄 License
 
