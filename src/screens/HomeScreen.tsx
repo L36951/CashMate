@@ -26,9 +26,21 @@ import {useFocusEffect} from '@react-navigation/native';
 import {MonthSelector} from '../components/YearMonthSelector/YearMonthSelector';
 import {useRoute} from '@react-navigation/native';
 import {loginAndGetAccessToken, testGoogleLogin} from '../auth/googleAuth';
+import {
+  Menu,
+  MenuOptions,
+  MenuOption,
+  MenuTrigger,
+} from 'react-native-popup-menu';
+import {deleteTransactionByIdAsync} from '../storage/transactionStorage'; // 要有刪除API
+import {Swipeable} from 'react-native-gesture-handler';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'; // ✅ 用來顯示垃圾桶
+import {Alert} from 'react-native';
+
 //import {GOOGLE_WEB_CLIENT_ID} from '@env';
 //import {GoogleSignin} from '@react-native-google-signin/google-signin';
 //import {loginAndGetAccessToken} from '../auth/googleAuth';
+
 const dummyData: Transaction[] = [
   {
     id: '1',
@@ -123,6 +135,59 @@ export const HomeScreen = ({navigation}: any) => {
       navigation.setParams({refresh: false});
     }
   }, [route.params]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchTransactions(); // 🔥 每次回來都重新拿資料
+    }, [currentMonth, currentYear]),
+  );
+  const handleDeleteTransaction = (id: string) => {
+    Alert.alert(
+      '刪除交易',
+      '你確定要刪除這筆交易嗎？',
+      [
+        {
+          text: '取消',
+          style: 'cancel',
+        },
+        {
+          text: '刪除',
+          style: 'destructive',
+          onPress: async () => {
+            await deleteTransactionByIdAsync(id);
+            await fetchTransactions();
+          },
+        },
+      ],
+      {cancelable: true},
+    );
+  };
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <Menu>
+          <MenuTrigger>
+            <Text style={{fontSize: 24, paddingHorizontal: 16}}>⋮</Text>
+          </MenuTrigger>
+          <MenuOptions
+            customStyles={{
+              optionsContainer: {width: 150, right: 0}, // 右上角打開
+            }}>
+            <MenuOption onSelect={() => navigation.navigate('Setting')}>
+              <Text style={{padding: 10}}>⚙️ 設定</Text>
+            </MenuOption>
+            <MenuOption
+              onSelect={() => navigation.navigate('GoogleBackUpScreen')}>
+              <Text style={{padding: 10}}>☁️ 雲端備份</Text>
+            </MenuOption>
+            <MenuOption onSelect={() => alert('登出功能稍後實作')}>
+              <Text style={{padding: 10}}>🚪 登出</Text>
+            </MenuOption>
+          </MenuOptions>
+        </Menu>
+      ),
+    });
+  }, [navigation]);
 
   useEffect(() => {
     fetchTransactions();
@@ -196,7 +261,20 @@ export const HomeScreen = ({navigation}: any) => {
   const total = transactions.reduce((sum, transaction) => {
     return sum + transaction.amount;
   }, 0); // 0 is the initial value of the sum
-
+  const renderRightActions = (transactionId: string) => (
+    <TouchableOpacity
+      onPress={() => handleDeleteTransaction(transactionId)}
+      style={{
+        backgroundColor: 'red',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: 80,
+        height: '100%',
+        borderRadius: 8,
+      }}>
+      <Icon name="trash-can-outline" size={30} color="#fff" />
+    </TouchableOpacity>
+  );
   return (
     <View style={styles.container}>
       <View>
@@ -211,39 +289,37 @@ export const HomeScreen = ({navigation}: any) => {
         />
       </View>
 
-      <ScrollView>
-        <DonutChart income={income} expense={expense} />
+      <View style={{flex: 1}}>
+        <ScrollView contentContainerStyle={{paddingBottom: 100}}>
+          <DonutChart income={income} expense={expense} />
 
-        {Object.entries(groupedTransactions).map(([date, txs]) => (
-          <TransactionGroup key={date} date={date} transactions={txs} />
-        ))}
-      </ScrollView>
-      <View style={styles.buttons}>
+          {Object.entries(groupedTransactions).map(([date, txs]) => (
+            <TransactionGroup
+              key={date}
+              date={date}
+              transactions={txs}
+              onDelete={handleDeleteTransaction}
+            />
+          ))}
+        </ScrollView>
+
         <TouchableOpacity
-          style={styles.addButton}
+          style={styles.floatingButton}
           onPress={() => navigation.navigate('AddExpense')}>
           <Text style={styles.addButtonText}>+</Text>
         </TouchableOpacity>
-        <Button
-          title="☁ 備份"
-          onPress={() => navigation.navigate('GoogleBackUpScreen')}
-        />
-        <Button
-          title="🗑️ 清除所有交易"
-          onPress={() => {
-            clearAllTransactionsAsync();
-            dropTransactionTableAsync();
-            fetchTransactions();
-          }}
-        />
-        <Button title="dummy" onPress={addDummyData} />
       </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {padding: 16, flex: 1, backgroundColor: '#fff'},
+  container: {
+    flex: 1,
+    backgroundColor: 'transparent', // ⭐ 透明
+    paddingHorizontal: 16,
+    paddingTop: 16,
+  },
   balance: {fontSize: 22, fontWeight: 'bold', marginBottom: 16},
   item: {fontSize: 16, paddingVertical: 4},
   buttons: {
@@ -265,5 +341,21 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 30,
     fontWeight: 'bold',
+  },
+  floatingButton: {
+    position: 'absolute',
+    bottom: 30, // 距離底部30px
+    alignSelf: 'center',
+    backgroundColor: 'rgb(241, 99, 74)',
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5, // 安卓有陰影
+    shadowColor: '#000', // iOS 陰影
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.25,
+    shadowRadius: 3.5,
   },
 });

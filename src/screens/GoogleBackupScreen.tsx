@@ -35,6 +35,8 @@ export const GoogleBackUpScreen = () => {
   const [busy, setBusy] = useState<'upload' | 'download' | null>(null); // 備份 / 還原用
   // ---------- helpers ----------
   const showErr = (msg: string) => Alert.alert('錯誤', msg);
+  const [backups, setBackups] = useState<{id: string; name: string}[]>([]);
+  const [showBackupList, setShowBackupList] = useState(false);
 
   const configureGoogle = () =>
     GoogleSignin.configure({
@@ -46,6 +48,21 @@ export const GoogleBackUpScreen = () => {
     const cached = await AsyncStorage.getItem('userInfo');
     cached && setUser(JSON.parse(cached));
   }, []);
+  const getAllBackups = async (accessToken: string) => {
+    const folderId = await ensureFolder(accessToken);
+    const {data} = await axios.get(
+      'https://www.googleapis.com/drive/v3/files',
+      {
+        headers: {Authorization: `Bearer ${accessToken}`},
+        params: {
+          q: `'${folderId}' in parents and name contains '.db' and trashed=false`,
+          orderBy: 'createdTime desc',
+          fields: 'files(id,name,createdTime)',
+        },
+      },
+    );
+    return data.files;
+  };
 
   // ---------- auth ----------
   const signIn = async () => {
@@ -88,16 +105,29 @@ export const GoogleBackUpScreen = () => {
       setBusy(null);
     }
   };
-
-  const downloadBackupFromDrive = async () => {
+  const openBackupList = async () => {
     const accessToken = await getToken();
     try {
       setBusy('download');
-      const {id, name} = await getLatestBackup(accessToken);
-      await downloadFile(accessToken, id);
-      Alert.alert('完成', `📥 已還原：${name}`);
+      const files = await getAllBackups(accessToken);
+      if (!files.length) throw new Error('找不到任何備份檔案，請先執行備份。');
+      setBackups(files);
+      setShowBackupList(true);
     } catch (e: any) {
       showErr(e?.message ?? '下載失敗');
+    } finally {
+      setBusy(null);
+    }
+  };
+  const handleDownload = async (fileId: string, fileName: string) => {
+    const accessToken = await getToken();
+    try {
+      setBusy('download');
+      await downloadFile(accessToken, fileId);
+      Alert.alert('完成', `📥 已還原：${fileName}`);
+      setShowBackupList(false);
+    } catch (e: any) {
+      showErr(e?.message ?? '還原失敗');
     } finally {
       setBusy(null);
     }
@@ -156,11 +186,12 @@ export const GoogleBackUpScreen = () => {
             />
             <PrimaryButton
               icon="download"
-              label="還原資料庫（下載最新備份）"
-              onPress={downloadBackupFromDrive}
+              label="選擇備份檔案還原"
+              onPress={openBackupList}
               loading={busy === 'download'}
               disabled={!!busy}
             />
+
             <PrimaryButton
               icon="logout"
               label="登出 Google 帳號"
@@ -173,6 +204,32 @@ export const GoogleBackUpScreen = () => {
           </>
         )}
       </ScrollView>
+      {showBackupList && (
+        <View style={styles.modal}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>選擇一個備份還原：</Text>
+
+            <ScrollView contentContainerStyle={{alignItems: 'center'}}>
+              {backups.map(file => (
+                <TouchableOpacity
+                  key={file.id}
+                  style={styles.backupItem}
+                  onPress={() => handleDownload(file.id, file.name)}>
+                  <Text>{file.name}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+
+            <TouchableOpacity
+              style={styles.modalCancel}
+              onPress={() => setShowBackupList(false)}>
+              <Text style={{color: 'red', marginTop: 12, fontSize: 16}}>
+                取消
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )}
     </SafeAreaView>
   );
 };
@@ -224,8 +281,13 @@ const uploadFile = async (
   folderId: string,
   dbPath: string,
 ) => {
+  const now = new Date();
+  const dateString = now.toISOString().slice(0, 10); // e.g., "2025-04-27"
+  const timeString = now.toTimeString().slice(0, 5).replace(':', ''); // e.g., "1430"
+  const filename = `cashmate_${dateString}_${timeString}.db`; // ⭐ 自動產生檔名
+
   const metadata = {
-    name: 'cashmate.db',
+    name: filename,
     mimeType: 'application/x-sqlite3',
     parents: [folderId],
   };
@@ -309,5 +371,34 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 10,
+  },
+  modal: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 20,
+  },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    width: '80%',
+    padding: 16,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  backupItem: {
+    paddingVertical: 10,
+    width: '100%',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    alignItems: 'center',
+  },
+  modalCancel: {
+    marginTop: 8,
   },
 });

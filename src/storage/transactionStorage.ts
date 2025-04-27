@@ -152,3 +152,34 @@ export const clearAllTransactionsAsync = (): Promise<void> => {
   };
 
   
+export const getDBConnection = async () => {
+  return SQLite.openDatabase('cashmate.db', '1.0', '', 1);
+};
+  export const deleteTransactionByIdAsync = async (id: string): Promise<void> => {
+    const db = await getDBConnection();
+  
+    return new Promise((resolve, reject) => {
+      db.transaction(
+        tx => {
+          tx.executeSql(
+            'DELETE FROM transactions WHERE id = ?;',
+            [id],
+            (_, result) => {
+              console.log('✅ 成功刪除交易 id:', id);
+              resolve();
+            },
+            (_, error) => {
+              console.error('❌ 刪除交易失敗:', error);
+              reject(error);
+              return true; // 重要！告訴 transaction 停止
+            }
+          );
+        },
+        error => {
+          console.error('❌ transaction error 刪除交易:', error);
+          reject(error);
+        }
+      );
+    });
+  };
+  
