@@ -119,7 +119,7 @@ A loading animation will appear during upload/download to inform the user and pr
 
 Here are some screenshots of the CashMate app:
 
-![Screenshot 1](./assets/screen1.png)
+![Screenshot 1](./assets/screen3.png)
 ![Screenshot 2](./assets/screen2.png)
 
 ## 📄 License
