@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {StatusBar} from 'react-native';
 import {NavigationContainer} from '@react-navigation/native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
@@ -7,7 +7,7 @@ import {AddExpenseScreen} from './src/screens/AddExpenseScreen';
 import {GoogleBackUpScreen} from './src/screens/GoogleBackupScreen';
 import {SettingScreen} from './src/screens/SettingScreen';
 import {MenuProvider} from 'react-native-popup-menu';
-import {configureGoogleSignin} from './src/auth/googleAuth';
+
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {AddNewCategoryScreen} from './src/screens/AddNewCategoryScreen';
 export type RootStackParamList = {
@@ -21,10 +21,6 @@ export type RootStackParamList = {
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function App(): React.JSX.Element {
-  useEffect(() => {
-    configureGoogleSignin();
-  }, []);
-
   return (
     <GestureHandlerRootView style={{flex: 1}}>
       <MenuProvider>
