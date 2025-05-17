@@ -41,9 +41,10 @@ export const MonthSelector: React.FC<MonthSelectorProps> = ({
     setTempMonth(month);
     onSelect(tempYear.toString(), month);
   };
+
   useEffect(() => {
     onSelect(tempYear.toString(), tempMonth);
-  }, [tempYear]);
+  }, [tempYear, tempMonth, onSelect]);
 
   return (
     <View style={styles.wrapper}>

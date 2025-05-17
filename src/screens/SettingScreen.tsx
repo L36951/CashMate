@@ -5,73 +5,7 @@ import {
   dropTransactionTableAsync,
   insertTransactionAsync,
 } from '../storage/transactionStorage';
-import {Transaction} from '../types/transaction';
-
-const dummyData: Transaction[] = [
-  {
-    id: '1',
-    icon: '🥘',
-    remark: 'Salary',
-    amount: 5000,
-    category: 'Income',
-    date: '2025-04-01',
-    type: 'income',
-  },
-  {
-    id: '2',
-    icon: '🥘',
-    remark: 'Salary',
-    amount: -3000,
-    date: '2025-04-12',
-    type: 'income',
-    category: 'Job',
-  },
-  {
-    id: '3',
-    icon: '🥘',
-    remark: 'Groceries',
-    amount: -200,
-    category: 'Food',
-    date: '2025-03-02',
-    type: 'expense',
-  },
-  {
-    id: '4',
-    icon: '🥘',
-    remark: 'Rent',
-    amount: -1500,
-    category: 'Housing',
-    date: '2025-03-03',
-    type: 'expense',
-  },
-  {
-    id: '5',
-    icon: '🍿',
-    remark: 'Utilities',
-    amount: -300,
-    category: 'Bills',
-    date: '2025-02-04',
-    type: 'expense',
-  },
-  {
-    id: '6',
-    icon: '🍔',
-    remark: 'Investment',
-    amount: 1000,
-    category: 'Income',
-    date: '2025-02-05',
-    type: 'income',
-  },
-  {
-    id: '7',
-    icon: '🌭',
-    remark: 'Investment',
-    amount: 1000,
-    category: 'Income',
-    date: '2025-01-05',
-    type: 'income',
-  },
-];
+import {transactionDummyData} from '../utils/dummyData/transaction';
 
 export const SettingScreen = () => {
   const handleClearTransactions = async () => {
@@ -81,7 +15,7 @@ export const SettingScreen = () => {
   };
 
   const handleAddDummyData = async () => {
-    for (const tx of dummyData) {
+    for (const tx of transactionDummyData) {
       await insertTransactionAsync(tx);
     }
     Alert.alert('完成', '✅ 已新增 Dummy 資料');

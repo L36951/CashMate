@@ -1,5 +1,6 @@
 import SQLite from 'react-native-sqlite-2';
 import { Transaction,GroupedTransactions } from '../types/transaction';
+import { Alert } from 'react-native';
 
 const db = SQLite.openDatabase('cashmate.db', '1.0', '', 1);
 
@@ -86,7 +87,7 @@ export const getAllTransactionsAsync = (): Promise<Transaction[]> => {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql(
-          `SELECT * FROM transactions ORDER BY date DESC, id DESC`,
+          'SELECT * FROM transactions ORDER BY date DESC, id DESC',
           [],
           (tx, results) => {
             const rows: Transaction[] = [];
@@ -108,7 +109,7 @@ export const getAllTransactionsAsync = (): Promise<Transaction[]> => {
       console.log(month)
       db.transaction((tx) => {
         tx.executeSql(
-          `SELECT * FROM transactions WHERE strftime('%Y-%m', date) = ? ORDER BY date DESC, id DESC`,
+          'SELECT * FROM transactions WHERE strftime("%Y-%m", date) = ? ORDER BY date DESC, id DESC',
           [month],
           (tx, results) => {
             const rows: Transaction[] = [];
@@ -130,7 +131,7 @@ export const clearAllTransactionsAsync = (): Promise<void> => {
     return new Promise((resolve, reject) => {
       db.transaction((tx) => {
         tx.executeSql(
-          `DELETE FROM transactions`,
+          'DELETE FROM transactions',
           [],
           () => resolve(),
           (_, error) => {
@@ -143,7 +144,6 @@ export const clearAllTransactionsAsync = (): Promise<void> => {
   };
 
   export const groupByDate = (transactions: Transaction[]): GroupedTransactions => {
-    
     return transactions.reduce((groups, tx) => {
       if (!groups[tx.date]) groups[tx.date] = [];
       groups[tx.date].push(tx);
@@ -151,13 +151,11 @@ export const clearAllTransactionsAsync = (): Promise<void> => {
     }, {} as GroupedTransactions);
   };
 
-  
 export const getDBConnection = async () => {
   return SQLite.openDatabase('cashmate.db', '1.0', '', 1);
 };
   export const deleteTransactionByIdAsync = async (id: string): Promise<void> => {
     const db = await getDBConnection();
-  
     return new Promise((resolve, reject) => {
       db.transaction(
         tx => {
@@ -182,4 +180,24 @@ export const getDBConnection = async () => {
       );
     });
   };
-  
+
+  export const handleDeleteTransaction = (id: string) => {
+      Alert.alert(
+        '刪除交易',
+        '你確定要刪除這筆交易嗎？',
+        [
+          {
+            text: '取消',
+            style: 'cancel',
+          },
+          {
+            text: '刪除',
+            style: 'destructive',
+            onPress: async () => {
+              await deleteTransactionByIdAsync(id);
+            },
+          },
+        ],
+        {cancelable: true},
+      );
+    };

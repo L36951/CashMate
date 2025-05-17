@@ -9,12 +9,13 @@ import {SettingScreen} from './src/screens/SettingScreen';
 import {MenuProvider} from 'react-native-popup-menu';
 import {configureGoogleSignin} from './src/auth/googleAuth';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
-
+import {AddNewCategoryScreen} from './src/screens/AddNewCategoryScreen';
 export type RootStackParamList = {
   Home: undefined;
   AddExpense: undefined;
   GoogleBackUpScreen: undefined;
   Setting: undefined;
+  AddCategory: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -35,12 +36,12 @@ function App(): React.JSX.Element {
             <Stack.Screen
               name="Home"
               component={HomeScreen}
-              options={{title: '首頁'}}
+              options={{headerShown: false}}
             />
             <Stack.Screen
               name="AddExpense"
               component={AddExpenseScreen}
-              options={{headerShown: false}}
+              options={{title: 'Add Record'}}
             />
             <Stack.Screen
               name="GoogleBackUpScreen"
@@ -50,7 +51,12 @@ function App(): React.JSX.Element {
             <Stack.Screen
               name="Setting"
               component={SettingScreen}
-              options={{title: '設定'}}
+              options={{title: 'settings'}}
+            />
+            <Stack.Screen
+              name="AddCategory"
+              component={AddNewCategoryScreen}
+              options={{title: 'Add Category'}}
             />
           </Stack.Navigator>
         </NavigationContainer>

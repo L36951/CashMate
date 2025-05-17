@@ -11,3 +11,4 @@ export interface Transaction {
 export interface GroupedTransactions {
   [date: string]: Transaction[];
 }
+
